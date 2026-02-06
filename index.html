@@ -154,21 +154,38 @@ let dragged;
 function initPuzzle() {
   puzzle.innerHTML = '';
   let pieces = [...Array(9).keys()].sort(() => Math.random() - 0.5);
+
+  let firstSelected = null; // for swapping pieces on tap/click
+
   pieces.forEach(pos => {
     const d = document.createElement('div');
     d.className = 'piece';
-    d.draggable = true;
     d.style.backgroundPosition = `${-(pos % 3) * 100}px ${-Math.floor(pos / 3) * 100}px`;
-    d.addEventListener('dragstart', e => dragged = d);
-    d.addEventListener('dragover', e => e.preventDefault());
-    d.addEventListener('drop', e => {
-      e.preventDefault();
-      let temp = d.style.backgroundPosition;
-      d.style.backgroundPosition = dragged.style.backgroundPosition;
-      dragged.style.backgroundPosition = temp;
+
+    // Handle both mouse click and touch
+    d.addEventListener('click', () => selectPiece(d));
+    d.addEventListener('touchstart', (e) => {
+      e.preventDefault(); // prevent scrolling
+      selectPiece(d);
     });
+
     puzzle.appendChild(d);
   });
+
+  function selectPiece(piece) {
+    if (!firstSelected) {
+      firstSelected = piece;
+      piece.style.outline = '2px solid red'; // highlight selection
+    } else {
+      // swap background positions
+      let temp = piece.style.backgroundPosition;
+      piece.style.backgroundPosition = firstSelected.style.backgroundPosition;
+      firstSelected.style.backgroundPosition = temp;
+
+      firstSelected.style.outline = ''; // remove highlight
+      firstSelected = null;
+    }
+  }
 }
 
 function checkPuzzle() {
@@ -271,3 +288,4 @@ function openLetter() {
 </script>
 </body>
 </html>
+

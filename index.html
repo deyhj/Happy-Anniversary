@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Happy Anniversary ❤️</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #fff;
+      padding: 25px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 420px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+    .hidden { display: none; }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #ee6c7d;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover { background: #e63950; }
+
+    /* Puzzle */
+   #puzzle {
+      display: grid;
+    grid-template-columns: repeat(3, 100px);
+    width: 300px;
+    height: 300px;
+    gap: 0;
+    margin-top: 15px;
+      
+    }
+    .piece {
+      width: 100px;
+    height: 100px;
+    background-image: url('mypic.jpg');
+    background-size: 300px 300px;
+    background-repeat: no-repeat;
+    display: block;
+    margin: 0;
+    }
+
+    /* Hanging photos */
+    #box {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 15px 0;
+      justify-content: center;
+    }
+    .photo {
+      width: 70px;
+      height: 70px;
+      background-size: cover;
+      border-radius: 8px;
+      cursor: grab;
+    }
+    #wall {
+      border: 2px dashed #ccc;
+      padding: 15px;
+      min-height: 120px;
+      border-radius: 10px;
+    }
+
+    /* Letter */
+    .letter {
+      background: #fff0f3;
+      padding: 20px;
+      border-radius: 12px;
+      line-height: 1.6;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- PAGE 1 -->
+<div class="card" id="page1">
+  <h1>Hi love 💕</h1>
+  <p>Enter your name to continue</p>
+  <input type="text" id="nameInput" placeholder="Your name" />
+  <br />
+  <button onclick="checkName()">Continue</button>
+  <p id="error" style="color:red"></p>
+</div>
+
+<!-- PAGE 2 -->
+<div class="card hidden" id="page2">
+  <h2>Fix our memory 🧩</h2>
+  <div id="puzzle"></div>
+  <button onclick="checkPuzzle()">Done</button>
+  <p id="puzzleMsg"></p>
+</div>
+
+<!-- PAGE 3 -->
+<div class="card hidden" id="page3">
+  <h2>Relive our moments ✨</h2>
+  <p>Tap each photo to reveal the memory</p>
+  <div id="memories" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0"></div>
+  <button id="continueBtn" class="hidden" onclick="goToLetter()">Continue</button>
+</div>
+
+<!-- PAGE 4 -->
+<div class="card hidden" id="page4">
+  <h2>💌 A letter for you</h2>
+  <button onclick="openLetter()">Open the letter</button>
+  <div id="letterContent" class="letter hidden">
+    <p>My love,</p>
+    <p>
+      Happy anniversary, love! Today is a special day because it reminds me of how lucky I am to have you in my life. I want to start by saying sorry for the times I may have upset you, for the moments I wasn’t patient, or when I didn’t show my best side. I know I’m not perfect, but I hope you know that I am always trying to be better for you.
+
+Thank you, from the bottom of my heart, for loving me the way you do for being patient, kind, and understanding even when I don’t deserve it. Thank you for all the little things you do, for the smiles, the hugs, and the moments that make every day better. You make my life brighter and happier just by being in it.
+
+I know I’m not very good at making messages or putting my feelings into words, but I hope you can feel how much I truly love you. My love for you isn’t just in words it’s in every action, every smile I give you, every time I try to make you happy. I promise to keep showing you how much you mean to me, not just today, but every day of our lives. You are my everything, and I love you more than I could ever explain.
+    </p>
+    <p>Always yours,<br/>Love 💕</p>
+  </div>
+</div>
+
+<script>
+const correctName = "Alyssa Sangalang";
+
+function checkName() {
+  const input = nameInput.value.trim();
+  if (input.toLowerCase() === correctName.toLowerCase()) {
+    page1.classList.add('hidden');
+    page2.classList.remove('hidden');
+    initPuzzle();
+  } else {
+    error.textContent = "Hinde Ikaw si Didang mylove HAHA";
+  }
+}
+
+/* PUZZLE */
+const puzzle = document.getElementById('puzzle');
+let dragged;
+
+function initPuzzle() {
+  puzzle.innerHTML = '';
+  let pieces = [...Array(9).keys()].sort(() => Math.random() - 0.5);
+  pieces.forEach(pos => {
+    const d = document.createElement('div');
+    d.className = 'piece';
+    d.draggable = true;
+    d.style.backgroundPosition = `${-(pos % 3) * 100}px ${-Math.floor(pos / 3) * 100}px`;
+    d.addEventListener('dragstart', e => dragged = d);
+    d.addEventListener('dragover', e => e.preventDefault());
+    d.addEventListener('drop', e => {
+      e.preventDefault();
+      let temp = d.style.backgroundPosition;
+      d.style.backgroundPosition = dragged.style.backgroundPosition;
+      dragged.style.backgroundPosition = temp;
+    });
+    puzzle.appendChild(d);
+  });
+}
+
+function checkPuzzle() {
+  const pieces = document.querySelectorAll('.piece');
+  let correct = 0;
+  pieces.forEach((p, i) => {
+    if (p.style.backgroundPosition === `${-(i % 3) * 100}px ${-Math.floor(i / 3) * 100}px`) correct++;
+  });
+  if (correct === 9) {
+    page2.classList.add('hidden');
+    page3.classList.remove('hidden');
+    initPhotos();
+  } else {
+    puzzleMsg.textContent = "Almost there 💕";
+  }
+}
+
+/* MEMORIES */
+let revealed = 0;
+function initPhotos() {
+  const memories = document.getElementById('memories');
+  memories.innerHTML = '';
+  revealed = 0;
+
+  const items = [
+    { type: 'image', src: 'p1.jpg' },
+    { type: 'image', src: 'p2.jpg' },
+    { type: 'image', src: 'pic3.jpg' },
+    { type: 'image', src: 'pic4.jpg' },
+    { type: 'image', src: 'pic5.jpg' },
+    { type: 'image', src: 'p6.jpg' },
+    { type: 'image', src: 'p7.jpg' },
+    { type: 'image', src: 'p8.jpg' },
+    { type: 'image', src: 'p9.jpg' },
+    { type: 'video', src: 'v1.mp4' },
+    { type: 'video', src: 'v2.mp4' },
+    { type: 'video', src: 'v3.mp4' },
+    { type: 'video', src: 'v4.mp4' },
+    { type: 'video', src: 'v6.mp4' },
+    { type: 'video', src: 'v7.mp4' },
+    { type: 'video', src: 'v8.mp4' },
+    { type: 'video', src: 'v9.mp4' },
+    { type: 'video', src: 'v10.mp4' },
+    { type: 'video', src: 'v11.mp4' },
+    { type: 'video', src: 'v12.mp4' },
+    { type: 'video', src: 'v13.mp4' },
+    { type: 'video', src: 'v14.mp4' },
+    { type: 'video', src: 'v15.mp4' },
+    { type: 'video', src: 'v16.mp4' },
+    { type: 'video', src: 'vid17.mov' }
+  ];
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.style.height = '90px';
+    card.style.borderRadius = '10px';
+    card.style.background = '#ffd6dc';
+    card.style.display = 'flex';
+    card.style.alignItems = 'center';
+    card.style.justifyContent = 'center';
+    card.style.cursor = 'pointer';
+    card.style.fontSize = '24px';
+    card.textContent = '💗';
+
+    card.addEventListener('click', () => {
+      if (card.dataset.opened) return;
+      card.dataset.opened = 'true';
+      card.textContent = '';
+
+      if (item.type === 'image') {
+        card.style.backgroundImage = `url('${item.src}')`;
+        card.style.backgroundSize = 'cover';
+      } else {
+        const vid = document.createElement('video');
+        vid.src = item.src;
+        vid.controls = true;
+        vid.autoplay = true;
+        vid.style.width = '100%';
+        vid.style.height = '100%';
+        vid.style.borderRadius = '10px';
+        card.appendChild(vid);
+      }
+
+      revealed++;
+      if (revealed === items.length) continueBtn.classList.remove('hidden');
+    });
+
+    memories.appendChild(card);
+  });
+}
+
+/* LETTER */
+function goToLetter() {
+  page3.classList.add('hidden');
+  page4.classList.remove('hidden');
+}
+function openLetter() {
+  letterContent.classList.remove('hidden');
+}
+</script>
+</body>
+</html>

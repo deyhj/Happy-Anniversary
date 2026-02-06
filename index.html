@@ -154,38 +154,33 @@ let dragged;
 function initPuzzle() {
   puzzle.innerHTML = '';
   let pieces = [...Array(9).keys()].sort(() => Math.random() - 0.5);
-
-  let firstSelected = null; // for swapping pieces on tap/click
+  let dragged = null;  // Global variable to track the selected piece
 
   pieces.forEach(pos => {
     const d = document.createElement('div');
     d.className = 'piece';
+    // Remove draggable attribute since we're using pointer events
     d.style.backgroundPosition = `${-(pos % 3) * 100}px ${-Math.floor(pos / 3) * 100}px`;
 
-    // Handle both mouse click and touch
-    d.addEventListener('click', () => selectPiece(d));
-    d.addEventListener('touchstart', (e) => {
-      e.preventDefault(); // prevent scrolling
-      selectPiece(d);
+    // Use pointerdown to select the piece (works for mouse and touch)
+    d.addEventListener('pointerdown', e => {
+      dragged = d;
+      e.preventDefault();  // Prevent default browser behavior
     });
 
     puzzle.appendChild(d);
   });
 
-  function selectPiece(piece) {
-    if (!firstSelected) {
-      firstSelected = piece;
-      piece.style.outline = '2px solid red'; // highlight selection
-    } else {
-      // swap background positions
-      let temp = piece.style.backgroundPosition;
-      piece.style.backgroundPosition = firstSelected.style.backgroundPosition;
-      firstSelected.style.backgroundPosition = temp;
-
-      firstSelected.style.outline = ''; // remove highlight
-      firstSelected = null;
+  // Attach pointerup to the puzzle container to handle swaps
+  puzzle.addEventListener('pointerup', e => {
+    if (dragged && e.target !== dragged && e.target.classList.contains('piece')) {
+      // Swap background positions
+      let temp = e.target.style.backgroundPosition;
+      e.target.style.backgroundPosition = dragged.style.backgroundPosition;
+      dragged.style.backgroundPosition = temp;
+      dragged = null;  // Reset after swap
     }
-  }
+  });
 }
 
 function checkPuzzle() {
